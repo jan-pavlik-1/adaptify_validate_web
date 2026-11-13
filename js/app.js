@@ -2,64 +2,53 @@
  * Adaptify — app.js
  *
  * Funkce:
- *  1. Přepínač velikosti textu (WCAG 1.4.4) s persistencí v localStorage
- *  2. Asynchronní odeslání formuláře přes Formspree
- *  3. Validace e-mailu + ARIA stavové zprávy (WCAG 3.3.1, 4.1.3)
- *  4. GA4 event tracking při úspěšné registraci
+ *  1. Asynchronní odeslání formulářů přes Formspree
+ *  2. Validace e-mailu + ARIA stavové zprávy (WCAG 3.3.1, 4.1.3)
+ *  3. GA4 event tracking při úspěšné registraci
  */
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* ═══════════════════════════════════════════════════
-     1. PŘEPÍNAČ VELIKOSTI TEXTU
-        WCAG 1.4.4: text musí být zvětšitelný na 200 %
-        bez ztráty obsahu nebo funkcionality.
-        Preferenci ukládáme do localStorage.
-     ═══════════════════════════════════════════════════ */
-  const toggleBtn  = document.getElementById('textSizeToggle');
-  const toggleText = document.getElementById('toggleText');
-  const html       = document.documentElement;
-  const LS_KEY     = 'adaptify-text-large';
+  /* ── Accessibility mode ──────────────────────────── */
+  const a11yToggle = document.getElementById('a11y-toggle');
+  const a11yKey = 'a11y_mode';
 
-  let isLarge = false;
-
-  /**
-   * Aplikuje (nebo odstraní) třídu pro zvětšený text
-   * a aktualizuje ARIA atributy tlačítka.
-   * @param {boolean} large
-   */
-  function applyTextSize(large) {
-    isLarge = large;
-    html.classList.toggle('text-large', large);
-
-    if (toggleBtn) {
-      toggleBtn.setAttribute('aria-pressed', String(large));
-      toggleBtn.setAttribute('aria-label',
-        large ? 'Zmenšit velikost textu' : 'Zvětšit velikost textu');
-    }
-
-    if (toggleText) {
-      toggleText.textContent = large ? 'Zmenšit text' : 'Zvětšit text';
+  function setAccessibilityMode(enabled) {
+    document.documentElement.classList.toggle('a11y-enhanced', enabled);
+    if (a11yToggle) {
+      a11yToggle.setAttribute('aria-pressed', String(enabled));
+      a11yToggle.textContent = enabled
+        ? 'Běžný režim'
+        : 'Zvětšit text a kontrast';
     }
 
     try {
-      large
-        ? localStorage.setItem(LS_KEY, '1')
-        : localStorage.removeItem(LS_KEY);
-    } catch { /* soukromý prohlížeč bez localStorage */ }
+      localStorage.setItem(a11yKey, String(enabled));
+    } catch {
+      // Režim zůstává aktivní pro aktuální návštěvu, i když úložiště není dostupné.
+    }
   }
 
-  // Obnov uložené nastavení při načtení stránky
+  let a11yEnabled = false;
   try {
-    if (localStorage.getItem(LS_KEY)) applyTextSize(true);
-  } catch { /* noop */ }
-
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => applyTextSize(!isLarge));
+    a11yEnabled = localStorage.getItem(a11yKey) === 'true';
+  } catch {
+    // Při nedostupném úložišti se použije běžný režim.
   }
 
+  document.documentElement.classList.toggle('a11y-enhanced', a11yEnabled);
+  if (a11yToggle) {
+    a11yToggle.setAttribute('aria-pressed', String(a11yEnabled));
+    a11yToggle.textContent = a11yEnabled
+      ? 'Běžný režim'
+      : 'Zvětšit text a kontrast';
+    a11yToggle.addEventListener('click', () => {
+      a11yEnabled = !a11yEnabled;
+      setAccessibilityMode(a11yEnabled);
+    });
+  }
 
   /* ═══════════════════════════════════════════════════
-     2. ODESLÁNÍ FORMULÁŘE (Formspree, async)
+     ODESLÁNÍ FORMULÁŘE (Formspree, async)
         WCAG 3.3.1: chyba je identifikována a popsána
         WCAG 4.1.3: stavová zpráva přes aria-live region
      ═══════════════════════════════════════════════════ */
@@ -97,7 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       /* -- Loading stav -- */
       setLoading(submitBtn, true);
-      clearStatus(statusEl);
+      form.setAttribute('aria-busy', 'true');
+      showStatus(statusEl, 'loading', 'Odesílám…');
 
       /* -- Odeslání na Formspree -- */
       try {
@@ -127,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Něco se pokazilo. Zkus to prosím znovu za chvíli.');
       } finally {
         setLoading(submitBtn, false);
+        form.removeAttribute('aria-busy');
       }
     });
   }
@@ -138,22 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
    * Zobrazí stavovou zprávu do aria-live regionu.
    * Použití textContent (nikoli innerHTML) pro bezpečnost.
    * @param {HTMLElement} el
-   * @param {'success'|'error'} type
+   * @param {'loading'|'success'|'error'} type
    * @param {string} msg
    */
   function showStatus(el, type, msg) {
+    el.hidden      = false;
     el.className   = `form-status form-status--${type}`;
     el.textContent = msg;
     // aria-live="polite" automaticky přečte změnu obsahu
-  }
-
-  /**
-   * Vymaže stavovou zprávu (vizuálně skryta přes CSS :empty).
-   * @param {HTMLElement} el
-   */
-  function clearStatus(el) {
-    el.className   = 'form-status';
-    el.textContent = '';
   }
 
   /**
@@ -171,6 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* -- Inicializace obou formulářů -- */
   initForm('hero-form', 'hero-status');
-  initForm('cta-form',  'cta-status');
+  initForm('cta-form', 'cta-status');
 
 });
