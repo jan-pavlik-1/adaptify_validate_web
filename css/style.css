@@ -59,6 +59,7 @@ html.text-large {
 
 body {
   font-family: var(--font);
+  font-size: 1rem;
   background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 100dvh;
@@ -184,7 +185,8 @@ body {
 
 /* Ghost button — ovládání přístupnosti v headeru
    WCAG 2.5.5: min. 44×44px dotyková plocha */
-.btn-ghost {
+.btn-ghost,
+.a11y-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -202,14 +204,16 @@ body {
   transition: background var(--transition), color var(--transition), border-color var(--transition);
 }
 
-.btn-ghost:hover {
+.btn-ghost:hover,
+.a11y-btn:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--color-text);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
 /* Stav: zvětšený text je aktivní */
-.btn-ghost[aria-pressed="true"] {
+.btn-ghost[aria-pressed="true"],
+.a11y-btn[aria-pressed="true"] {
   background: var(--color-accent-dim);
   color: var(--color-accent);
   border-color: rgba(132, 204, 22, 0.4);
@@ -682,4 +686,71 @@ body {
     background: Highlight;
     color: HighlightText;
   }
+}
+
+/* Enhanced accessibility mode */
+.accessible-mode {
+  font-size: 120%;
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-card: #000000;
+  --color-card-hover: #000000;
+  --color-text: #FFFFFF;
+  --color-text-muted: #FFFFFF;
+  --color-text-dim: #FFFFFF;
+  --color-border: #84CC16;
+}
+
+.accessible-mode body,
+.accessible-mode .site-header,
+.accessible-mode .features-section,
+.accessible-mode .feature-card,
+.accessible-mode .cta-card,
+.accessible-mode .form-input,
+.accessible-mode .badge,
+.accessible-mode .feature-icon,
+.accessible-mode .form-status {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+.accessible-mode .hero-heading {
+  font-size: clamp(3.3rem, 10.8vw, 6.3rem);
+}
+
+.accessible-mode .section-title {
+  font-size: clamp(2.1rem, 4.8vw, 3rem);
+}
+
+.accessible-mode .cta-title {
+  font-size: clamp(1.95rem, 4.8vw, 2.55rem);
+}
+
+.accessible-mode .feature-card,
+.accessible-mode .cta-card,
+.accessible-mode .form-input,
+.accessible-mode .btn-primary,
+.accessible-mode .a11y-btn {
+  border: 2px solid #84CC16;
+}
+
+.accessible-mode .site-header,
+.accessible-mode .badge,
+.accessible-mode .feature-icon,
+.accessible-mode .form-status {
+  border-color: #84CC16;
+}
+
+.accessible-mode .form-input::placeholder {
+  color: #FFFFFF;
+}
+
+.accessible-mode .a11y-btn[aria-pressed="true"] {
+  background: #84CC16;
+  color: #000000;
+}
+
+.accessible-mode *:focus-visible {
+  outline: 4px solid #84CC16 !important;
+  outline-offset: 4px !important;
 }

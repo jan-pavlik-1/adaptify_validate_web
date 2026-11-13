@@ -13,12 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const a11yKey = 'a11y_mode';
 
   function setAccessibilityMode(enabled) {
-    document.documentElement.classList.toggle('a11y-enhanced', enabled);
+    document.documentElement.classList.toggle('accessible-mode', enabled);
     if (a11yToggle) {
       a11yToggle.setAttribute('aria-pressed', String(enabled));
-      a11yToggle.textContent = enabled
-        ? 'Běžný režim'
-        : 'Zvětšit text a kontrast';
     }
 
     try {
@@ -35,12 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Při nedostupném úložišti se použije běžný režim.
   }
 
-  document.documentElement.classList.toggle('a11y-enhanced', a11yEnabled);
+  document.documentElement.classList.toggle('accessible-mode', a11yEnabled);
   if (a11yToggle) {
     a11yToggle.setAttribute('aria-pressed', String(a11yEnabled));
-    a11yToggle.textContent = a11yEnabled
-      ? 'Běžný režim'
-      : 'Zvětšit text a kontrast';
     a11yToggle.addEventListener('click', () => {
       a11yEnabled = !a11yEnabled;
       setAccessibilityMode(a11yEnabled);
