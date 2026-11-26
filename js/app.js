@@ -3,8 +3,8 @@
  *
  * Funkce:
  *  1. Přepínání režimu přístupnosti (Zvětšit text a kontrast)
- *  2. Asynchronní odeslání formulářů přes Formspree + GA4 event tracking
- *  3. Cookie lišta (uložení volby a opětovné vyvolání z patičky)
+ *  2. Asynchronní odeslání formulářů (registrace + odhlášení GDPR)
+ *  3. Pop-up potvrzení registrace a Cookie lišta
  */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       localStorage.setItem(a11yKey, String(enabled));
     } catch {
-      // Režim zůstává aktivní pro aktuální návštěvu, i když úložiště není dostupné.
+      // Ignorovat chybu úložiště
     }
   }
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     a11yEnabled = localStorage.getItem(a11yKey) === 'true';
   } catch {
-    // Při nedostupném úložišti se použije běžný režim.
+    // Ignorovat chybu úložiště
   }
 
   document.documentElement.classList.toggle('accessible-mode', a11yEnabled);
@@ -41,10 +41,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ═══════════════════════════════════════════════════
-     ODESLÁNÍ FORMULÁŘE (Formspree, async)
-     ═══════════════════════════════════════════════════ */
+  /* ── Pop-up okno po registraci ───────────────────── */
+  const signupModal      = document.getElementById('signup-modal');
+  const closeSignupBtn   = document.getElementById('close-signup-modal');
+  const confirmSignupBtn = document.getElementById('confirm-signup-modal');
+  let lastSignupTrigger  = null;
 
+  function openSignupModal() {
+    if (!signupModal) return;
+    lastSignupTrigger = document.activeElement;
+    signupModal.hidden = false;
+    confirmSignupBtn?.focus();
+  }
+
+  function closeSignupModal() {
+    if (!signupModal) return;
+    signupModal.hidden = true;
+    if (lastSignupTrigger && typeof lastSignupTrigger.focus === 'function') {
+      lastSignupTrigger.focus();
+    }
+  }
+
+  closeSignupBtn?.addEventListener('click', closeSignupModal);
+  confirmSignupBtn?.addEventListener('click', closeSignupModal);
+
+  signupModal?.addEventListener('click', (e) => {
+    if (e.target === signupModal) closeSignupModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && signupModal && !signupModal.hidden) {
+      closeSignupModal();
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════
+     ODESLÁNÍ FORMULÁŘŮ (Formspree, async)
+     ═══════════════════════════════════════════════════ */
   function initForm(formId, statusId) {
     const form     = document.getElementById(formId);
     const statusEl = document.getElementById(statusId);
@@ -82,14 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         form.reset();
-        showStatus(statusEl, 'success',
-          'Hotovo! Hned po spuštění tě upozorníme.');
 
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'sign_up', {
-            method:  'email',
-            form_id: formId,
-          });
+        if (formId === 'unsubscribe-form') {
+          showStatus(statusEl, 'success',
+            'Odhlášeno. Žádost o výmaz tvého e-mailu z databáze jsme přijali a už ti nic posílat nebudeme.');
+        } else {
+          showStatus(statusEl, 'success',
+            'Díky, moc se těšíme! Hned po spuštění ti pošleme e-mail.');
+          openSignupModal();
+
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'sign_up', {
+              method:  'email',
+              form_id: formId,
+            });
+          }
         }
 
       } catch {
@@ -131,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     savedConsent = localStorage.getItem(cookieKey);
   } catch {
-    // Pokud není localStorage dostupné, lišta se zobrazí.
+    // Ignorovat chybu úložiště
   }
 
   if (!savedConsent && cookieBanner) {
