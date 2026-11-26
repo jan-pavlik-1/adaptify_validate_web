@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initForm('hero-form', 'hero-status');
   initForm('cta-form', 'cta-status');
+  initForm('unsubscribe-form', 'unsub-status');
 
   /* ═══════════════════════════════════════════════════
      COOKIE LIŠTA

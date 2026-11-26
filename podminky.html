@@ -144,6 +144,45 @@
         </ul>
       </section>
 
+      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
+        <h3 class="legal-section-title" style="font-size: 1.05rem;">Rychlé odvolání souhlasu (výmaz e-mailu)</h3>
+        <p class="legal-text">
+          Pokud už nechceš dostat upozornění o spuštění aplikace, zadej svůj e-mail níže. Tvůj záznam z databáze obratem odstraníme.
+        </p>
+
+        <form id="unsubscribe-form"
+              action="https://formspree.io/f/xjyyzkbd"
+              method="POST"
+              novalidate
+              aria-label="Formulář pro odvolání souhlasu a výmaz e-mailu">
+          <input type="hidden" name="typ_zadosti" value="ODVOLANI_SOUHLASU_GDPR_VYMAZ">
+
+          <div class="form-row">
+            <label for="unsub-email" class="sr-only">Tvůj registrovaný e-mail</label>
+            <input type="email"
+                   id="unsub-email"
+                   name="email"
+                   autocomplete="email"
+                   placeholder="tvuj@email.cz"
+                   required
+                   aria-required="true"
+                   class="form-input">
+
+            <button type="submit" class="btn-ghost" style="border-color: var(--color-accent); color: var(--color-accent);">
+              <span class="btn-label">Odvolat souhlas</span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div id="unsub-status"
+               role="status"
+               aria-live="polite"
+               aria-atomic="true"
+               class="form-status"
+               hidden></div>
+        </form>
+      </div>
+
     </div>
   </main>
 
