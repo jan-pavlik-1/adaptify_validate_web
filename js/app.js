@@ -4,7 +4,7 @@
  * Funkce:
  *  1. Přepínání režimu přístupnosti (Zvětšit text a kontrast)
  *  2. Asynchronní odeslání formulářů přes Formspree + GA4 event tracking
- *  3. Cookie lišta a modální okno pro Podmínky užití a GDPR
+ *  3. Cookie lišta (uložení volby a opětovné vyvolání z patičky)
  */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -118,18 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initForm('cta-form', 'cta-status');
 
   /* ═══════════════════════════════════════════════════
-     COOKIE LIŠTA & MODÁLNÍ OKNO (PODMÍNKY / GDPR)
+     COOKIE LIŠTA
      ═══════════════════════════════════════════════════ */
-  const cookieKey        = 'adaptify_cookie_consent';
-  const cookieBanner     = document.getElementById('cookie-banner');
-  const cookieAcceptBtn  = document.getElementById('cookie-accept-btn');
-  const cookieNecBtn     = document.getElementById('cookie-necessary-btn');
-  const resetCookiesBtn  = document.getElementById('reset-cookies-btn');
-
-  const legalModal       = document.getElementById('legal-modal');
-  const closeLegalBtn    = document.getElementById('close-legal-modal');
-  const openLegalBtns    = document.querySelectorAll('[data-open-legal]');
-  let lastFocusedEl      = null;
+  const cookieKey       = 'adaptify_cookie_consent';
+  const cookieBanner    = document.getElementById('cookie-banner');
+  const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+  const cookieNecBtn    = document.getElementById('cookie-necessary-btn');
+  const resetCookiesBtn = document.getElementById('reset-cookies-btn');
 
   let savedConsent = null;
   try {
@@ -161,39 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // Ignorovat chybu úložiště
     }
     if (cookieBanner) cookieBanner.hidden = false;
-  });
-
-  function openLegalModal() {
-    if (!legalModal) return;
-    lastFocusedEl = document.activeElement;
-    legalModal.hidden = false;
-    closeLegalBtn?.focus();
-  }
-
-  function closeLegalModal() {
-    if (!legalModal) return;
-    legalModal.hidden = true;
-    if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
-      lastFocusedEl.focus();
-    }
-  }
-
-  openLegalBtns.forEach((btn) => {
-    btn.addEventListener('click', openLegalModal);
-  });
-
-  closeLegalBtn?.addEventListener('click', closeLegalModal);
-
-  legalModal?.addEventListener('click', (e) => {
-    if (e.target === legalModal) {
-      closeLegalModal();
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && legalModal && !legalModal.hidden) {
-      closeLegalModal();
-    }
   });
 
 });

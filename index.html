@@ -93,7 +93,6 @@
         </p>
 
         <!-- Formulář pro sběr e-mailů -->
-        <!-- WCAG 1.3.1 & 3.3.2: labely a popis polí -->
         <div class="form-wrapper">
           <form id="hero-form"
                 action="https://formspree.io/f/xjyyzkbd"
@@ -102,7 +101,6 @@
                 aria-label="Formulář pro předběžný přístup">
 
             <div class="form-row">
-              <!-- WCAG 1.3.1: label vázaný na input přes for/id -->
               <label for="hero-email" class="sr-only">Tvoje e-mailová adresa</label>
               <input type="email"
                      id="hero-email"
@@ -120,12 +118,10 @@
               </button>
             </div>
 
-            <!-- Nápověda k poli -->
             <p id="hero-email-hint" class="form-hint">
               E-mail využijeme výhradně pro oznámení o spuštění aplikace. Žádný spam, souhlas můžeš kdykoli odvolat.
             </p>
 
-            <!-- WCAG 4.1.3: live region pro stavové zprávy (úspěch / chyba) -->
             <div id="hero-status"
                  role="status"
                  aria-live="polite"
@@ -151,7 +147,6 @@
           </p>
         </div>
 
-        <!-- Sémantický seznam funkčností -->
         <ul class="features-grid" role="list" aria-label="Klíčové funkce aplikace">
 
           <!-- Funkce 1 -->
@@ -267,9 +262,9 @@
         &copy; 2026 Adaptify &ndash; Navrženo s&nbsp;přístupností na prvním místě.
       </p>
       <div class="footer-legal-links">
-        <button type="button" class="footer-legal-btn" data-open-legal>
+        <a href="./podminky.html" class="footer-legal-btn">
           Podmínky užití a ochrana osobních údajů
-        </button>
+        </a>
         <button type="button" class="footer-legal-btn" id="reset-cookies-btn">
           Nastavení cookies
         </button>
@@ -285,11 +280,11 @@
        hidden>
     <div class="cookie-banner-inner">
       <p class="cookie-banner-text">
-        Tento web používá soubory cookies k zajištění správného fungování a k anonymní analýze návštěvnosti (Google Analytics).
+        Tento web používá soubory cookies k zajištění správného fungování, k analýze návštěvnosti a k měření kampaní (např. Google Analytics, Sklik apod.).
         Více informací najdeš v
-        <button type="button" class="cookie-inline-link" data-open-legal>
+        <a href="./podminky.html" class="cookie-inline-link">
           Podmínkách užití a zásadách zpracování údajů
-        </button>.
+        </a>.
       </p>
       <div class="cookie-banner-actions">
         <button type="button" id="cookie-necessary-btn" class="btn-ghost">
@@ -299,56 +294,6 @@
           Přijmout vše
         </button>
       </div>
-    </div>
-  </div>
-
-  <!-- ═══════════ MODÁLNÍ OKNO: PODMÍNKY UŽITÍ, GDPR & COOKIES ═══════════ -->
-  <div id="legal-modal"
-       class="legal-modal-backdrop"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="legal-modal-title"
-       hidden>
-    <div class="legal-modal-dialog">
-      <button type="button"
-              id="close-legal-modal"
-              class="legal-modal-close"
-              aria-label="Zavřít okno s podmínkami">✕</button>
-
-      <h2 id="legal-modal-title" class="legal-modal-title">
-        Podmínky užití, ochrana údajů a cookies
-      </h2>
-
-      <h3 class="legal-modal-heading">1. Podmínky užití webu</h3>
-      <p class="legal-modal-text">
-        Webová stránka <strong>adaptify.cz</strong> slouží k představení připravované mobilní fitness aplikace <strong>Adaptify</strong> a ke sběru nezávazných registrací do čekací listiny (pre-launch). Obsah webu má informativní charakter a může být průběžně upravován. Veškeré texty, grafické prvky a design rozhraní jsou chráněny autorským právem.
-      </p>
-
-      <h3 class="legal-modal-heading">2. Správce a rozsah zpracování osobních údajů (GDPR)</h3>
-      <p class="legal-modal-text">
-        Správcem osobních údajů je tým projektu <strong>Adaptify</strong>. Prostřednictvím registračního formuláře zpracováváme výhradně tvoji <strong>e-mailovou adresu</strong>, kterou nám dobrovolně poskytneš.
-      </p>
-      <ul class="legal-modal-list">
-        <li><strong>Účel zpracování:</strong> Jednorázové zaslání upozornění o spuštění aplikace Adaptify, případně pozvánky do uzavřeného beta testování.</li>
-        <li><strong>Právní základ:</strong> Tvůj výslovný souhlas dle čl. 6 odst. 1 písm. a) nařízení GDPR udělený odesláním formuláře.</li>
-        <li><strong>Doba uložení:</strong> Do spuštění aplikace nebo do okamžiku, kdy svůj souhlas odvoláš.</li>
-      </ul>
-
-      <h3 class="legal-modal-heading">3. Zpracovatelé třetích stran</h3>
-      <ul class="legal-modal-list">
-        <li><strong>Formspree:</strong> Technické zajištění příjmu a doručení e-mailových registrací z formulářů na webu.</li>
-        <li><strong>Google Analytics / Google Tag Manager:</strong> Anonymizované měření návštěvnosti a interakcí za účelem zlepšování uživatelského zážitku a přístupnosti webu.</li>
-      </ul>
-
-      <h3 class="legal-modal-heading">4. Soubory cookies</h3>
-      <p class="legal-modal-text">
-        Web využívá <strong>nezbytné technické cookies / místní úložiště (localStorage)</strong> pro uložení tvé volby nastavení cookies a režimu přístupnosti, a <strong>analytické cookies</strong> (Google Analytics) pro vyhodnocování návštěvnosti. Své nastavení můžeš kdykoli změnit kliknutím na „Nastavení cookies“ v patičce webu.
-      </p>
-
-      <h3 class="legal-modal-heading">5. Tvá práva</h3>
-      <p class="legal-modal-text">
-        Svůj souhlas se zpracováním e-mailu můžeš kdykoli bezplatně odvolat. Máš právo požadovat přístup ke svým osobním údajům, jejich opravu nebo úplné vymazání.
-      </p>
     </div>
   </div>
 
