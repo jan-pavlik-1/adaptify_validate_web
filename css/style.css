@@ -48,11 +48,9 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
-  /* WCAG 1.4.4: plynulý přechod při zvětšení textu */
   transition: font-size 0.3s ease;
 }
 
-/* WCAG 1.4.4: zvětšení textu na 125 % bez ztráty obsahu */
 html.text-large {
   font-size: 20px;
 }
@@ -67,7 +65,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Výběr textu */
 ::selection {
   background: var(--color-accent);
   color: #0E0E10;
@@ -75,8 +72,6 @@ body {
 
 /* ═══════════════════════════════════════════════════════
    WCAG 2.4.7 — Viditelný focus indikátor
-   Kontrast outline: lime (#84CC16) na tmavém pozadí = více než 8:1
-   Min. tloušťka 3px + offset pro čitelnost
    ═══════════════════════════════════════════════════════ */
 *:focus-visible {
   outline: 3px solid var(--color-accent) !important;
@@ -84,13 +79,12 @@ body {
   border-radius: var(--radius-sm);
 }
 
-/* Odstraní výchozí outline jen pokud prohlížeč podporuje :focus-visible */
 *:focus:not(:focus-visible) {
   outline: none;
 }
 
 /* ═══════════════════════════════════════════════════════
-   WCAG 2.4.1 — Skip link (přeskočit navigaci)
+   WCAG 2.4.1 — Skip link
    ═══════════════════════════════════════════════════════ */
 .skip-link {
   position: absolute;
@@ -114,7 +108,6 @@ body {
   outline-offset: 2px !important;
 }
 
-/* WCAG 1.3.1 — Vizuálně skrytý obsah dostupný čtečkám */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -134,7 +127,6 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  /* Průhledné pozadí s blur — vizuální vrstvení */
   background: rgba(14, 14, 16, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -150,7 +142,6 @@ body {
   justify-content: space-between;
 }
 
-/* Logo */
 .logo {
   display: inline-flex;
   align-items: center;
@@ -183,12 +174,11 @@ body {
   transition: color var(--transition);
 }
 
-/* Ghost button — ovládání přístupnosti v headeru
-   WCAG 2.5.5: min. 44×44px dotyková plocha */
 .btn-ghost,
 .a11y-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   min-height: 44px;
   min-width: 44px;
@@ -211,7 +201,6 @@ body {
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-/* Stav: zvětšený text je aktivní */
 .btn-ghost[aria-pressed="true"],
 .a11y-btn[aria-pressed="true"] {
   background: var(--color-accent-dim);
@@ -231,7 +220,6 @@ body {
   overflow: hidden;
 }
 
-/* Dekorativní vrstva — vizuální efekt, žádný obsah */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -268,7 +256,6 @@ body {
     linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
   background-size: 56px 56px;
-  /* Mřížka je viditelná jen uprostřed — plynulý přechod do ztracena */
   mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, black 20%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, black 20%, transparent 100%);
 }
@@ -284,7 +271,6 @@ body {
   gap: 1.75rem;
 }
 
-/* Pre-launch badge */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -314,8 +300,6 @@ body {
   50%       { opacity: 0.4; transform: scale(0.75); }
 }
 
-/* Hlavní nadpis
-   clamp(): responzivní typografie bez media queries */
 .hero-heading {
   font-size: clamp(2.75rem, 9vw, 5.25rem);
   font-weight: 900;
@@ -329,7 +313,6 @@ body {
   color: var(--color-accent);
 }
 
-/* Popis */
 .hero-desc {
   font-size: clamp(1rem, 2.5vw, 1.1875rem);
   line-height: 1.75;
@@ -350,11 +333,9 @@ body {
   gap: 0.625rem;
 }
 
-/* Input
-   WCAG 1.4.11: kontrast ohraničení formulářového prvku min. 3:1 */
 .form-input {
   flex: 1;
-  min-height: 52px; /* WCAG 2.5.5: min dotyková plocha 44px */
+  min-height: 52px;
   padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1.5px solid rgba(255, 255, 255, 0.35);
@@ -366,7 +347,6 @@ body {
   transition: border-color var(--transition), background var(--transition);
   -webkit-appearance: none;
   appearance: none;
-  /* WCAG 1.4.10: zabrání překrytí obsahu při reflow */
   min-width: 0;
 }
 
@@ -379,21 +359,16 @@ body {
   background: rgba(132, 204, 22, 0.04);
 }
 
-/* WCAG 3.3.1: vizuální indikace neplatné hodnoty */
 .form-input[aria-invalid="true"] {
   border-color: var(--color-error-txt);
 }
 
-/* Varianta: celá šíře (CTA sekce) */
 .form-input--block {
   width: 100%;
   display: block;
   margin-bottom: 0.75rem;
 }
 
-/* Primární CTA tlačítko
-   WCAG 2.5.5: min. 44px výška
-   Kontrast textu: #0E0E10 na #84CC16 = >8:1 ✓                 */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -416,21 +391,17 @@ body {
 .btn-primary:hover  { background: var(--color-accent-hov); }
 .btn-primary:active { transform: scale(0.97); }
 
-/* WCAG 1.3.3: stav disabled není vyjádřen jen barvou — opacity + cursor */
 .btn-primary:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Plná šíře (CTA sekce) */
 .btn-primary--block {
   width: 100%;
   margin-bottom: 0.75rem;
 }
 
-/* Spinner — loading stav tlačítka
-   WCAG 1.4.1: spinner je aria-hidden; text tlačítka změněn v JS */
 .btn-spinner {
   display: none;
   width: 1.125rem;
@@ -449,7 +420,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Nápověda pod formulářem */
 .form-hint {
   margin-top: 0.625rem;
   font-size: 0.8125rem;
@@ -459,8 +429,6 @@ body {
 
 .form-hint--center { text-align: center; }
 
-/* Stavová zpráva (live region)
-   WCAG 4.1.3: live region vždy přítomný v DOM (prázdný = skrytý přes :empty) */
 .form-status {
   display: flex;
   align-items: flex-start;
@@ -522,7 +490,6 @@ body {
 
 .text-accent { color: var(--color-accent); }
 
-/* Grid karet */
 .features-grid {
   list-style: none;
   display: grid;
@@ -606,7 +573,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════
-   FOOTER
+   FOOTER & LEGAL LINKS
    ═══════════════════════════════════════════════════════ */
 .site-footer {
   border-top: 1px solid var(--color-border);
@@ -625,9 +592,188 @@ body {
   line-height: 1.6;
 }
 
+.footer-legal-links {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+}
+
+.footer-legal-btn {
+  background: none;
+  border: none;
+  min-height: 44px;
+  padding: 0.35rem 0.5rem;
+  color: var(--color-text-muted);
+  font-family: var(--font);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.footer-legal-btn:hover {
+  color: var(--color-accent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   COOKIE BANNER
+   ═══════════════════════════════════════════════════════ */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: var(--color-card);
+  border-top: 2px solid var(--color-accent);
+  color: var(--color-text);
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.cookie-banner[hidden] {
+  display: none;
+}
+
+.cookie-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+
+.cookie-banner-text {
+  flex: 1 1 320px;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.cookie-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  font-family: var(--font);
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cookie-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cookie-btn-accept {
+  min-height: 44px;
+  padding: 0.5rem 1.125rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEGAL MODAL (PODMÍNKY UŽITÍ, GDPR & COOKIES)
+   ═══════════════════════════════════════════════════════ */
+.legal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.legal-modal-backdrop[hidden] {
+  display: none;
+}
+
+.legal-modal-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  background: var(--color-card);
+  color: var(--color-text);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.legal-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+}
+
+.legal-modal-close:hover {
+  background: var(--color-accent);
+  color: #0E0E10;
+}
+
+.legal-modal-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  line-height: 1.25;
+  padding-right: 3rem;
+  margin-bottom: 1.25rem;
+}
+
+.legal-modal-heading {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-top: 1.25rem;
+  margin-bottom: 0.4rem;
+}
+
+.legal-modal-text {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
+.legal-modal-list {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.legal-modal-list li {
+  margin-bottom: 0.35rem;
+}
+
 /* ═══════════════════════════════════════════════════════
    WCAG 1.4.10 — Reflow
-   Obsah se přeřadí při 320px bez horizontálního scrollování
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 520px) {
   .form-row       { flex-direction: column; }
@@ -636,19 +782,13 @@ body {
   .hero           { padding: 3.5rem 1rem; }
   .features-section,
   .cta-section    { padding: 4rem 1rem; }
+  .legal-modal-dialog { padding: 1.5rem 1.25rem; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   WCAG 1.3.4 — Orientace (landscape mobil)
-   ═══════════════════════════════════════════════════════ */
 @media (orientation: landscape) and (max-height: 500px) {
   .hero { min-height: auto; padding: 3rem 1.5rem; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   WCAG 2.3.3 — Redukce pohybu
-   Respektuje systémové nastavení uživatele
-   ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -664,9 +804,6 @@ body {
   .feature-card:hover { transform: none; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   WCAG — High Contrast Mode (Windows / forced-colors)
-   ═══════════════════════════════════════════════════════ */
 @media (forced-colors: active) {
   .btn-primary {
     forced-color-adjust: none;
@@ -688,7 +825,9 @@ body {
   }
 }
 
-/* Enhanced accessibility mode */
+/* ═══════════════════════════════════════════════════════
+   ENHANCED ACCESSIBILITY MODE
+   ═══════════════════════════════════════════════════════ */
 .accessible-mode {
   font-size: 120%;
   --color-bg: #000000;
@@ -709,7 +848,10 @@ body {
 .accessible-mode .form-input,
 .accessible-mode .badge,
 .accessible-mode .feature-icon,
-.accessible-mode .form-status {
+.accessible-mode .form-status,
+.accessible-mode .cookie-banner,
+.accessible-mode .legal-modal-dialog,
+.accessible-mode .legal-modal-close {
   background: #000000;
   color: #FFFFFF;
 }
@@ -730,7 +872,9 @@ body {
 .accessible-mode .cta-card,
 .accessible-mode .form-input,
 .accessible-mode .btn-primary,
-.accessible-mode .a11y-btn {
+.accessible-mode .a11y-btn,
+.accessible-mode .btn-ghost,
+.accessible-mode .legal-modal-close {
   border: 2px solid #84CC16;
 }
 
@@ -753,4 +897,123 @@ body {
 .accessible-mode *:focus-visible {
   outline: 4px solid #84CC16 !important;
   outline-offset: 4px !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SAMOSTATNÁ STRÁNKA PODMÍNEK (podminky.html)
+   ═══════════════════════════════════════════════════════ */
+.footer-legal-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: underline;
+}
+
+.legal-page {
+  padding: 4rem 1.5rem 6rem;
+}
+
+.legal-page-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.legal-back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: opacity var(--transition);
+}
+
+.legal-back-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.legal-page-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+}
+
+.legal-page-meta {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.legal-section {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.legal-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  margin-bottom: 0.875rem;
+  line-height: 1.3;
+}
+
+.legal-text {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  margin-bottom: 0.875rem;
+}
+
+.legal-text:last-child {
+  margin-bottom: 0;
+}
+
+.legal-text strong {
+  color: var(--color-text);
+}
+
+.legal-list {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  margin-left: 1.25rem;
+  margin-bottom: 0.875rem;
+}
+
+.legal-list li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-list strong {
+  color: var(--color-text);
+}
+
+.legal-ext-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.accessible-mode .legal-section {
+  background: #000000;
+  border: 2px solid #84CC16;
+}
+
+@media (max-width: 520px) {
+  .legal-page {
+    padding: 2.5rem 1rem 4rem;
+  }
+  .legal-section {
+    padding: 1.35rem 1.25rem;
+  }
 }

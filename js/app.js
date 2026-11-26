@@ -2,9 +2,9 @@
  * Adaptify — app.js
  *
  * Funkce:
- *  1. Asynchronní odeslání formulářů přes Formspree
- *  2. Validace e-mailu + ARIA stavové zprávy (WCAG 3.3.1, 4.1.3)
- *  3. GA4 event tracking při úspěšné registraci
+ *  1. Přepínání režimu přístupnosti (Zvětšit text a kontrast)
+ *  2. Asynchronní odeslání formulářů (registrace + odhlášení GDPR)
+ *  3. Pop-up potvrzení registrace a Cookie lišta
  */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       localStorage.setItem(a11yKey, String(enabled));
     } catch {
-      // Režim zůstává aktivní pro aktuální návštěvu, i když úložiště není dostupné.
+      // Ignorovat chybu úložiště
     }
   }
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try {
     a11yEnabled = localStorage.getItem(a11yKey) === 'true';
   } catch {
-    // Při nedostupném úložišti se použije běžný režim.
+    // Ignorovat chybu úložiště
   }
 
   document.documentElement.classList.toggle('accessible-mode', a11yEnabled);
@@ -41,17 +41,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ═══════════════════════════════════════════════════
-     ODESLÁNÍ FORMULÁŘE (Formspree, async)
-        WCAG 3.3.1: chyba je identifikována a popsána
-        WCAG 4.1.3: stavová zpráva přes aria-live region
-     ═══════════════════════════════════════════════════ */
+  /* ── Pop-up okno po registraci ───────────────────── */
+  const signupModal      = document.getElementById('signup-modal');
+  const closeSignupBtn   = document.getElementById('close-signup-modal');
+  const confirmSignupBtn = document.getElementById('confirm-signup-modal');
+  let lastSignupTrigger  = null;
 
-  /**
-   * Inicializuje formulář: validace + async submit.
-   * @param {string} formId     - id atribut formuláře
-   * @param {string} statusId   - id aria-live elementu pro zprávy
-   */
+  function openSignupModal() {
+    if (!signupModal) return;
+    lastSignupTrigger = document.activeElement;
+    signupModal.hidden = false;
+    confirmSignupBtn?.focus();
+  }
+
+  function closeSignupModal() {
+    if (!signupModal) return;
+    signupModal.hidden = true;
+    if (lastSignupTrigger && typeof lastSignupTrigger.focus === 'function') {
+      lastSignupTrigger.focus();
+    }
+  }
+
+  closeSignupBtn?.addEventListener('click', closeSignupModal);
+  confirmSignupBtn?.addEventListener('click', closeSignupModal);
+
+  signupModal?.addEventListener('click', (e) => {
+    if (e.target === signupModal) closeSignupModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && signupModal && !signupModal.hidden) {
+      closeSignupModal();
+    }
+  });
+
+  /* ═══════════════════════════════════════════════════
+     ODESLÁNÍ FORMULÁŘŮ (Formspree, async)
+     ═══════════════════════════════════════════════════ */
   function initForm(formId, statusId) {
     const form     = document.getElementById(formId);
     const statusEl = document.getElementById(statusId);
@@ -63,27 +89,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const emailInput = form.querySelector('input[type="email"]');
       const submitBtn  = form.querySelector('button[type="submit"]');
 
-      /* -- Validace e-mailu -- */
       const emailValue = (emailInput?.value ?? '').trim();
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
       if (!emailValue || !emailRegex.test(emailValue)) {
-        // WCAG 3.3.1: pole označeno jako neplatné + chybová zpráva
         emailInput?.setAttribute('aria-invalid', 'true');
         showStatus(statusEl, 'error', 'Zadej prosím platnou e-mailovou adresu.');
         emailInput?.focus();
         return;
       }
 
-      // Platný vstup — odstraň příznak chyby
       emailInput?.removeAttribute('aria-invalid');
 
-      /* -- Loading stav -- */
       setLoading(submitBtn, true);
       form.setAttribute('aria-busy', 'true');
       showStatus(statusEl, 'loading', 'Odesílám…');
 
-      /* -- Odeslání na Formspree -- */
       try {
         const response = await fetch(form.action, {
           method:  'POST',
@@ -93,17 +114,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Úspěch
         form.reset();
-        showStatus(statusEl, 'success',
-          'Hotovo! Hned po spuštění tě upozorníme.');
 
-        // GA4 event — sledování konverzí
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'sign_up', {
-            method:  'email',
-            form_id: formId,
-          });
+        if (formId === 'unsubscribe-form') {
+          showStatus(statusEl, 'success',
+            'Odhlášeno. Žádost o vymazání jsme přijali k vyřízení.');
+        } else {
+          showStatus(statusEl, 'success',
+            'Díky, moc se těšíme! Hned po spuštění ti pošleme e-mail.');
+          openSignupModal();
+
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'sign_up', {
+              method:  'email',
+              form_id: formId,
+            });
+          }
         }
 
       } catch {
@@ -116,38 +142,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  /* ── Pomocné funkce ───────────────────────────────── */
-
-  /**
-   * Zobrazí stavovou zprávu do aria-live regionu.
-   * Použití textContent (nikoli innerHTML) pro bezpečnost.
-   * @param {HTMLElement} el
-   * @param {'loading'|'success'|'error'} type
-   * @param {string} msg
-   */
   function showStatus(el, type, msg) {
     el.hidden      = false;
     el.className   = `form-status form-status--${type}`;
     el.textContent = msg;
-    // aria-live="polite" automaticky přečte změnu obsahu
   }
 
-  /**
-   * Přepne loading stav tlačítka.
-   * Třída is-loading přepíná .btn-label / .btn-spinner přes CSS.
-   * @param {HTMLElement|null} btn
-   * @param {boolean} loading
-   */
   function setLoading(btn, loading) {
     if (!btn) return;
     btn.disabled = loading;
     btn.classList.toggle('is-loading', loading);
   }
 
-
-  /* -- Inicializace obou formulářů -- */
   initForm('hero-form', 'hero-status');
   initForm('cta-form', 'cta-status');
+  initForm('unsubscribe-form', 'unsub-status');
+
+  /* ═══════════════════════════════════════════════════
+     COOKIE LIŠTA
+     ═══════════════════════════════════════════════════ */
+  const cookieKey       = 'adaptify_cookie_consent';
+  const cookieBanner    = document.getElementById('cookie-banner');
+  const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+  const cookieNecBtn    = document.getElementById('cookie-necessary-btn');
+  const resetCookiesBtn = document.getElementById('reset-cookies-btn');
+
+  let savedConsent = null;
+  try {
+    savedConsent = localStorage.getItem(cookieKey);
+  } catch {
+    // Ignorovat chybu úložiště
+  }
+
+  if (!savedConsent && cookieBanner) {
+    cookieBanner.hidden = false;
+  }
+
+  function saveCookieConsent(level) {
+    try {
+      localStorage.setItem(cookieKey, level);
+    } catch {
+      // Ignorovat chybu úložiště
+    }
+    if (cookieBanner) cookieBanner.hidden = true;
+  }
+
+  cookieAcceptBtn?.addEventListener('click', () => saveCookieConsent('all'));
+  cookieNecBtn?.addEventListener('click', () => saveCookieConsent('necessary'));
+
+  resetCookiesBtn?.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(cookieKey);
+    } catch {
+      // Ignorovat chybu úložiště
+    }
+    if (cookieBanner) cookieBanner.hidden = false;
+  });
 
 });
