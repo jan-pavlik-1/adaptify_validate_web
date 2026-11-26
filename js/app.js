@@ -2,9 +2,9 @@
  * Adaptify — app.js
  *
  * Funkce:
- *  1. Asynchronní odeslání formulářů přes Formspree
- *  2. Validace e-mailu + ARIA stavové zprávy (WCAG 3.3.1, 4.1.3)
- *  3. GA4 event tracking při úspěšné registraci
+ *  1. Přepínání režimu přístupnosti (Zvětšit text a kontrast)
+ *  2. Asynchronní odeslání formulářů přes Formspree + GA4 event tracking
+ *  3. Cookie lišta a modální okno pro Podmínky užití a GDPR
  */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -43,15 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ═══════════════════════════════════════════════════
      ODESLÁNÍ FORMULÁŘE (Formspree, async)
-        WCAG 3.3.1: chyba je identifikována a popsána
-        WCAG 4.1.3: stavová zpráva přes aria-live region
      ═══════════════════════════════════════════════════ */
 
-  /**
-   * Inicializuje formulář: validace + async submit.
-   * @param {string} formId     - id atribut formuláře
-   * @param {string} statusId   - id aria-live elementu pro zprávy
-   */
   function initForm(formId, statusId) {
     const form     = document.getElementById(formId);
     const statusEl = document.getElementById(statusId);
@@ -63,27 +56,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const emailInput = form.querySelector('input[type="email"]');
       const submitBtn  = form.querySelector('button[type="submit"]');
 
-      /* -- Validace e-mailu -- */
       const emailValue = (emailInput?.value ?? '').trim();
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
       if (!emailValue || !emailRegex.test(emailValue)) {
-        // WCAG 3.3.1: pole označeno jako neplatné + chybová zpráva
         emailInput?.setAttribute('aria-invalid', 'true');
         showStatus(statusEl, 'error', 'Zadej prosím platnou e-mailovou adresu.');
         emailInput?.focus();
         return;
       }
 
-      // Platný vstup — odstraň příznak chyby
       emailInput?.removeAttribute('aria-invalid');
 
-      /* -- Loading stav -- */
       setLoading(submitBtn, true);
       form.setAttribute('aria-busy', 'true');
       showStatus(statusEl, 'loading', 'Odesílám…');
 
-      /* -- Odeslání na Formspree -- */
       try {
         const response = await fetch(form.action, {
           method:  'POST',
@@ -93,12 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        // Úspěch
         form.reset();
         showStatus(statusEl, 'success',
           'Hotovo! Hned po spuštění tě upozorníme.');
 
-        // GA4 event — sledování konverzí
         if (typeof gtag !== 'undefined') {
           gtag('event', 'sign_up', {
             method:  'email',
@@ -116,38 +102,98 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  /* ── Pomocné funkce ───────────────────────────────── */
-
-  /**
-   * Zobrazí stavovou zprávu do aria-live regionu.
-   * Použití textContent (nikoli innerHTML) pro bezpečnost.
-   * @param {HTMLElement} el
-   * @param {'loading'|'success'|'error'} type
-   * @param {string} msg
-   */
   function showStatus(el, type, msg) {
     el.hidden      = false;
     el.className   = `form-status form-status--${type}`;
     el.textContent = msg;
-    // aria-live="polite" automaticky přečte změnu obsahu
   }
 
-  /**
-   * Přepne loading stav tlačítka.
-   * Třída is-loading přepíná .btn-label / .btn-spinner přes CSS.
-   * @param {HTMLElement|null} btn
-   * @param {boolean} loading
-   */
   function setLoading(btn, loading) {
     if (!btn) return;
     btn.disabled = loading;
     btn.classList.toggle('is-loading', loading);
   }
 
-
-  /* -- Inicializace obou formulářů -- */
   initForm('hero-form', 'hero-status');
   initForm('cta-form', 'cta-status');
+
+  /* ═══════════════════════════════════════════════════
+     COOKIE LIŠTA & MODÁLNÍ OKNO (PODMÍNKY / GDPR)
+     ═══════════════════════════════════════════════════ */
+  const cookieKey        = 'adaptify_cookie_consent';
+  const cookieBanner     = document.getElementById('cookie-banner');
+  const cookieAcceptBtn  = document.getElementById('cookie-accept-btn');
+  const cookieNecBtn     = document.getElementById('cookie-necessary-btn');
+  const resetCookiesBtn  = document.getElementById('reset-cookies-btn');
+
+  const legalModal       = document.getElementById('legal-modal');
+  const closeLegalBtn    = document.getElementById('close-legal-modal');
+  const openLegalBtns    = document.querySelectorAll('[data-open-legal]');
+  let lastFocusedEl      = null;
+
+  let savedConsent = null;
+  try {
+    savedConsent = localStorage.getItem(cookieKey);
+  } catch {
+    // Pokud není localStorage dostupné, lišta se zobrazí.
+  }
+
+  if (!savedConsent && cookieBanner) {
+    cookieBanner.hidden = false;
+  }
+
+  function saveCookieConsent(level) {
+    try {
+      localStorage.setItem(cookieKey, level);
+    } catch {
+      // Ignorovat chybu úložiště
+    }
+    if (cookieBanner) cookieBanner.hidden = true;
+  }
+
+  cookieAcceptBtn?.addEventListener('click', () => saveCookieConsent('all'));
+  cookieNecBtn?.addEventListener('click', () => saveCookieConsent('necessary'));
+
+  resetCookiesBtn?.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(cookieKey);
+    } catch {
+      // Ignorovat chybu úložiště
+    }
+    if (cookieBanner) cookieBanner.hidden = false;
+  });
+
+  function openLegalModal() {
+    if (!legalModal) return;
+    lastFocusedEl = document.activeElement;
+    legalModal.hidden = false;
+    closeLegalBtn?.focus();
+  }
+
+  function closeLegalModal() {
+    if (!legalModal) return;
+    legalModal.hidden = true;
+    if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+      lastFocusedEl.focus();
+    }
+  }
+
+  openLegalBtns.forEach((btn) => {
+    btn.addEventListener('click', openLegalModal);
+  });
+
+  closeLegalBtn?.addEventListener('click', closeLegalModal);
+
+  legalModal?.addEventListener('click', (e) => {
+    if (e.target === legalModal) {
+      closeLegalModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && legalModal && !legalModal.hidden) {
+      closeLegalModal();
+    }
+  });
 
 });
