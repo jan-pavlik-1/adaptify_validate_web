@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (formId === 'unsubscribe-form') {
           showStatus(statusEl, 'success',
-            'Odhlášeno. Žádost o výmaz tvého e-mailu z databáze jsme přijali a už ti nic posílat nebudeme.');
+            'Odhlášeno. Žádost o vymazání jsme přijali k vyřízení.');
         } else {
           showStatus(statusEl, 'success',
             'Díky, moc se těšíme! Hned po spuštění ti pošleme e-mail.');
